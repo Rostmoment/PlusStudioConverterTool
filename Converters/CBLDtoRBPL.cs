@@ -262,27 +262,47 @@ internal static partial class Converters
             else
                 ConsoleHelper.LogConverterInfo("The room has no activity available.");
 
-            // Add potential door spots if allowed to
-            if (onlyHallways && allowAutomaticPotentialDoorPlacement)
+
+
+            if (onlyHallways)
             {
-                counter = 0;
-                ConsoleHelper.LogConverterInfo("Adding potential door spots to suitable places...");
+                if (allowAutomaticPotentialDoorPlacement) // Add potential door spots if allowed to
+                {
+                    counter = 0;
+                    ConsoleHelper.LogConverterInfo("Adding potential door spots to suitable places...");
+                    foreach (var cell in roomAsset.cells)
+                    {
+                        if (roomAsset.potentialDoorPositions.Contains(cell.position)) continue; // Skip cells which already have potential door spots
+
+                        for (int z = 0; z < 4; z++)
+                        {
+                            var newPos = cell.position + PlusStudioLevelLoader.Extensions.ToByte(((Direction)z).ToNETIntVector2());
+                            if (!roomAsset.cells.Exists(checkCell => checkCell.position == newPos)) // Checks if no cell gets into that position - which means the current cell in check is a "border" cell
+                            {
+                                roomAsset.potentialDoorPositions.Add(cell.position);
+                                counter++;
+                                break; // Stop this loop and go to the next cell
+                            }
+                        }
+                    }
+                    ConsoleHelper.LogConverterInfo($"{counter} additional potential door spots were added!");
+                }
+
+                // Make every cell empty
                 foreach (var cell in roomAsset.cells)
                 {
-                    if (roomAsset.potentialDoorPositions.Contains(cell.position)) continue; // Skip cells which already have potential door spots
-
                     for (int z = 0; z < 4; z++)
                     {
-                        var newPos = cell.position + PlusStudioLevelLoader.Extensions.ToByte(((Direction)z).ToNETIntVector2());
-                        if (!roomAsset.cells.Exists(checkCell => checkCell.position == newPos)) // Checks if no cell gets into that position - which means the current cell in check is a "border" cell
+                        var dir = (Direction)z;
+                        var newPos = cell.position + PlusStudioLevelLoader.Extensions.ToByte(dir.ToNETIntVector2());
+                        if (IsBitSet(cell.walls, z) // If there's a wall there
+                        && !roomAsset.cells.Exists(checkCell => checkCell.position == newPos)) // Check if that direction has no cell adjacent
                         {
-                            roomAsset.potentialDoorPositions.Add(cell.position);
-                            counter++;
-                            break; // Stop this loop and go to the next cell
+                            cell.walls = new(ToggleBit(cell.walls, z));
+                            cell.coverage &= ~dir.ToCoverage(); // Removes coverage
                         }
                     }
                 }
-                ConsoleHelper.LogConverterInfo($"{counter} additional potential door spots were added!");
             }
 
 

@@ -222,7 +222,7 @@ namespace PlusStudioConverterTool.Services
             for (int i = 0; i < rooms.Count; i++)
             {
                 var room = rooms[i];
-                fname = GetUniqueFilePath(originalFileName + $"_{room.type}_{i + 1}.rbpl");
+                fname = GetUniqueFilePath(originalFileName + (rooms.Count != 1 ? $"_{room.type}_{i + 1}.rbpl" : ".rbpl"));
                 using var writer = new BinaryWriter(File.OpenWrite(fname));
                 room.Write(writer);
                 ConsoleHelper.LogInfo($"Created {Path.GetFileName(fname)} with success!");

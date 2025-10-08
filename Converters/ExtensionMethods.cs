@@ -56,12 +56,12 @@ internal static partial class Converters
         return list;
     }
 
-    static List<PlusStudioLevelFormat.PlusDirection> DirsFromTile(this PlusStudioLevelFormat.Cell t, bool checkForWall)
+    static List<PlusDirection> DirsFromTile(this PlusStudioLevelFormat.Cell t, bool checkForWall)
     {
-        List<PlusStudioLevelFormat.PlusDirection> list = [];
+        List<PlusDirection> list = [];
         for (int i = 1; i <= 4; i++)
             if (IsBitSet(t.walls, i) == checkForWall)
-                list.Add((PlusStudioLevelFormat.PlusDirection)i);
+                list.Add((PlusDirection)i);
 
         return list;
     }
@@ -97,12 +97,12 @@ internal static partial class Converters
         _ => new(0, 0)
     };
 
-    static (int, int) ToByteVector2(this PlusStudioLevelFormat.PlusDirection dir) => dir switch
+    static (int, int) ToByteVector2(this PlusDirection dir) => dir switch
     {
-        PlusStudioLevelFormat.PlusDirection.North => (0, 1),
-        PlusStudioLevelFormat.PlusDirection.West => (-1, 0),
-        PlusStudioLevelFormat.PlusDirection.East => (1, 0),
-        PlusStudioLevelFormat.PlusDirection.South => (0, -1),
+        PlusDirection.North => (0, 1),
+        PlusDirection.West => (-1, 0),
+        PlusDirection.East => (1, 0),
+        PlusDirection.South => (0, -1),
         _ => new(0, 0)
     };
 
@@ -133,13 +133,22 @@ internal static partial class Converters
         _ => PlusLevelFormat.PlusDirection.Null
     };
 
-    static PlusStudioLevelFormat.PlusDirection GetOpposite(this PlusStudioLevelFormat.PlusDirection dir) => dir switch
+    static PlusDirection GetOpposite(this PlusDirection dir) => dir switch
     {
-        PlusStudioLevelFormat.PlusDirection.North => PlusStudioLevelFormat.PlusDirection.South,
-        PlusStudioLevelFormat.PlusDirection.West => PlusStudioLevelFormat.PlusDirection.East,
-        PlusStudioLevelFormat.PlusDirection.East => PlusStudioLevelFormat.PlusDirection.West,
-        PlusStudioLevelFormat.PlusDirection.South => PlusStudioLevelFormat.PlusDirection.North,
-        _ => PlusStudioLevelFormat.PlusDirection.Null
+        PlusDirection.North => PlusDirection.South,
+        PlusDirection.West => PlusDirection.East,
+        PlusDirection.East => PlusDirection.West,
+        PlusDirection.South => PlusDirection.North,
+        _ => PlusDirection.Null
+    };
+
+    static PlusCellCoverage ToCoverage(this Direction dir) => dir switch
+    {
+        Direction.North => PlusCellCoverage.North,
+        Direction.East => PlusCellCoverage.East,
+        Direction.South => PlusCellCoverage.South,
+        Direction.West => PlusCellCoverage.West,
+        _ => PlusCellCoverage.Center
     };
 
     private static Direction ToDirection(this IntVector2 vec)
