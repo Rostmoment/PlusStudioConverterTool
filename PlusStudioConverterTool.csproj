@@ -12,6 +12,8 @@
     <PackageIcon></PackageIcon>
     <ApplicationIcon>cbldtobld.ico</ApplicationIcon>
     <PublishTrimmed>true</PublishTrimmed>
+	<PublishSingleFile>true</PublishSingleFile>
+	<SelfContained>true</SelfContained>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,12 +22,24 @@
 
   <ItemGroup>
 	 
+	 <Reference Include="0Harmony">
+	   <HintPath>..\..\..\..\..\Steam\steamapps\common\Baldi's Basics Plus\BepInEx\core\0Harmony.dll</HintPath>
+	 </Reference>
+	 
 	 <Reference Include="Assembly-CSharp">
-	   <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Baldi's Basics Plus\BALDI_Data\Managed\Assembly-CSharp.dll</HintPath>
+	   <HintPath>..\..\..\..\..\Steam\steamapps\common\Baldi's Basics Plus\BALDI_Data\Managed\Assembly-CSharp.dll</HintPath>
 	 </Reference>
 	 
 	 <Reference Include="BaldiLevelEditor">
 	 <HintPath>References\BaldiLevelEditor.dll</HintPath>
+	 </Reference>
+	 
+	 <Reference Include="BepInEx">
+	   <HintPath>..\..\..\..\..\Steam\steamapps\common\Baldi's Basics Plus\BepInEx\core\BepInEx.dll</HintPath>
+	 </Reference>
+	 
+	 <Reference Include="BepInEx.Harmony">
+	   <HintPath>..\..\..\..\..\Steam\steamapps\common\Baldi's Basics Plus\BepInEx\core\BepInEx.Harmony.dll</HintPath>
 	 </Reference>
 	 
 	 <Reference Include="PlusLevelFormat">
@@ -35,30 +49,22 @@
 	 <Reference Include="PlusLevelLoader">
 	   <HintPath>References\PlusLevelLoader.dll</HintPath>
 	 </Reference>
-
-   <Reference Include="PlusLevelStudio">
-	   <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Baldi's Basics Plus\BepInEx\plugins\newEditor\PlusLevelStudio.dll</HintPath>
+	 
+	 <Reference Include="PlusLevelStudio">
+	   <HintPath>..\..\..\..\..\Steam\steamapps\common\Baldi's Basics Plus\BepInEx\plugins\PlusLevelStudio.dll</HintPath>
 	 </Reference>
-
-   <Reference Include="PlusStudioLevelFormat">
-	   <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Baldi's Basics Plus\BepInEx\plugins\newEditor\PlusStudioLevelFormat.dll</HintPath>
+	 
+	 <Reference Include="PlusStudioLevelFormat">
+	   <HintPath>..\..\..\..\..\Steam\steamapps\common\Baldi's Basics Plus\BepInEx\plugins\PlusStudioLevelFormat.dll</HintPath>
 	 </Reference>
-
-   <Reference Include="PlusStudioLevelLoader">
-	   <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Baldi's Basics Plus\BepInEx\plugins\newEditor\PlusStudioLevelLoader.dll</HintPath>
+	 
+	 <Reference Include="PlusStudioLevelLoader">
+	   <HintPath>..\..\..\..\..\Steam\steamapps\common\Baldi's Basics Plus\BepInEx\plugins\PlusStudioLevelLoader.dll</HintPath>
 	 </Reference>
-    
-    <Reference Include="UnityEngine.CoreModule">
-      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Baldi's Basics Plus\BALDI_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
-    </Reference>
-
-    <Reference Include="HarmonyLib">
-      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Baldi's Basics Plus\BepInEx\core\0Harmony.dll</HintPath>
-    </Reference>
-
-    <Reference Include="BepInEx">
-      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Baldi's Basics Plus\BepInEx\core\BepInEx.dll</HintPath>
-    </Reference>
+	 
+	 <Reference Include="UnityEngine.CoreModule">
+	   <HintPath>..\..\..\..\..\Steam\steamapps\common\Baldi's Basics Plus\BALDI_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+	 </Reference>
   </ItemGroup>
 
   <ItemGroup>

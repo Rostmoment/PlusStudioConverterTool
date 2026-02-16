@@ -11,6 +11,7 @@ namespace PlusStudioConverterTool.Services
 {
     internal static class ConverterService
     {
+
         // Convert a list of absolute file paths (.cbld) and optionally export all
         // converted files into exportFolder. If exportFolder is null the converted
         // file is written next to the original file.

@@ -4,8 +4,8 @@ using PlusStudioConverterTool.Services;
 
 namespace PlusStudioConverterTool
 {
-	internal static partial class Program
-	{
+    internal static partial class Program
+    {
 		// Bool: Indicate whether to clean up the args or not
 		// Bool: indicates whether to prompt restart tool or directly restart the tool (false to direct restart)
 		static (bool, bool) ContentPackageExtractorField(ref string[] args)
