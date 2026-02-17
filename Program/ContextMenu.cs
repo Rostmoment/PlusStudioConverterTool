@@ -1,82 +1,76 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Security;
+using System.Text;
 
 namespace PlusStudioConverterTool
 {
     internal static partial class Program
     {
+        private class ConvertationRule(string buttonText, string from, string to, params string[] args)
+        {
+
+            public string ProgId => $"{PROG_ID}{from}";
+            public string ButtonText { get; } = buttonText;
+            public string From { get; } = from;
+            public string To { get; } = to;
+            public string[] Args { get; } = args;
+        }
+
         private const string PROG_ID = "Plus.Studio.Converter.Tool";
 
-        private static bool CheckIfRegistered(string fileExtension, out string progId)
+
+        private static void AddConvert(ConvertationRule rule)
         {
             try
             {
-                using (RegistryKey extKey = Registry.ClassesRoot.OpenSubKey(fileExtension))
+                using (RegistryKey extKey = Registry.CurrentUser.CreateSubKey($@"Software\Classes\{rule.From}"))
                 {
-                    if (extKey != null)
+                    extKey.SetValue("", rule.ProgId);
+                }
+
+                string shellPath = $@"Software\Classes\{rule.ProgId}\shell\{rule.ButtonText}\command";
+
+                using (RegistryKey menuKey = Registry.CurrentUser.CreateSubKey(shellPath))
+                {
+                    StringBuilder b = new StringBuilder();
+                    b.Append('"').Append(EXE_PATH).Append('"');
+
+                    foreach (string arg in rule.Args)
                     {
-                        progId = extKey.GetValue("") as string;
-                        return !string.IsNullOrEmpty(progId);
+                        b.Append(" \"").Append(arg).Append('"');
                     }
-                }
-            }
-            catch (SecurityException)
-            {
-            }
 
-            progId = null;
-            return false;
-        }
+                    b.Append(" \"%1\"");
 
-        private static void RegisterProgId(string description = "Plus Studio Converter")
-        {
-            try
-            {
-                using (RegistryKey progIdKey = Registry.ClassesRoot.CreateSubKey(PROG_ID))
-                {
-                    progIdKey?.SetValue("", description);
+                    menuKey.SetValue("", b.ToString());
                 }
+
+                Console.WriteLine($"Added rule from {rule.From} to {rule.To} with name {rule.ButtonText}");
             }
-            catch (UnauthorizedAccessException ex)
+            catch (SecurityException ex)
             {
-                Console.WriteLine("Needed to run as administrator");
+                Console.WriteLine($"Access denied: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error adding {rule.ButtonText}: {ex.Message}");
             }
         }
 
-        private static void RegisterExtensions(string[] extensions)
+        private static void InitializeContextMenu()
         {
-            foreach (string ext in extensions)
-            {
-                if (CheckIfRegistered(ext, out string existingProgId) && existingProgId == PROG_ID)
-                    continue;
+            ConvertationRule[] rules = [
+                // Legacy files
+                new ConvertationRule("Convert to .bld", ".cbld", ".bld"),
 
-                try
-                {
-                    using (RegistryKey extKey = Registry.ClassesRoot.CreateSubKey(ext))
-                    {
-                        extKey?.SetValue("", PROG_ID);
-                    }
-                }
-                catch (UnauthorizedAccessException ex)
-                {
-                    Console.WriteLine($"Failed to register {ext}, {ex}");
-                }
-            }
-        }
+                // Newer files
+                new ConvertationRule("Convert to .ebpl", ".rbpl", ".ebpl")
+            ];
 
-        private static void AddConvert(string menuName, string exePath, string toFormat)
-        {
-            try
+            foreach (ConvertationRule rule in rules)
             {
-                using (RegistryKey menuKey = Registry.ClassesRoot.CreateSubKey($"{PROG_ID}\\shell\\{menuName}\\command"))
-                {
-                    menuKey?.SetValue("", $"\"{exePath}\" \"%1\" \"{toFormat}\"");
-                }
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                Console.WriteLine($"Couldn't add {menuName} {ex}");
+                AddConvert(rule);
             }
         }
     }

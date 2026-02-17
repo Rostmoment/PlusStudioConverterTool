@@ -1,52 +1,56 @@
 ﻿using PlusStudioConverterTool.Extensions;
 using PlusStudioConverterTool.Services;
+using System.Reflection;
+using System.Security.Principal;
 
 namespace PlusStudioConverterTool
 {
 	internal static partial class Program
 	{
-		private static void Main(string[] args)
+        private const string EXE_PATH = "C:\\Program Files\\PlusStudioConverterTool\\Program.exe";
+
+        private static void Main(string[] args)
 		{
 
-			// Debug operation to get the json file all ready
-			// File.WriteAllText(Path.Combine(Directory.GetCurrentDirectory(), "FilterObjectSample.json"),
-			// 	System.Text.Json.JsonSerializer.Serialize(new FilterObject(), new System.Text.Json.JsonSerializerOptions { WriteIndented = true })
-			// 	{
-			// 		AreaType = LevelFieldType.Object,
-			// 		replacements = new()
-			// 		{
-			// 		{ "examination", "examinationtable" },
-			// 		{ "cabinettall", "cabinet" },
-			// 		}
-			// 	}, Newtonsoft.Json.Formatting.Indented)
-			// );
-			// File.WriteAllText(Path.Combine(Directory.GetCurrentDirectory(), "FilterDoorSample.json"),
-			// 	System.Text.Json.JsonSerializer.Serialize(new FilterObject(), new System.Text.Json.JsonSerializerOptions { WriteIndented = true })
-			// 	{
-			// 		AreaType = LevelFieldType.Door,
-			// 		replacements = new()
-			// 		{
-			// 		{ "swing", "swinging" },
-			// 		{ "swingsilent", "swinging_silent" },
-			// 		{ "coin", "coinswinging" },
-			// 		}
-			// 	}, Newtonsoft.Json.Formatting.Indented)
-			// );
-			// File.WriteAllText(Path.Combine(Directory.GetCurrentDirectory(), "FilterTextureSample.json"),
-			// 	System.Text.Json.JsonSerializer.Serialize(new FilterObject(), new System.Text.Json.JsonSerializerOptions { WriteIndented = true })
-			// 	{
-			// 		AreaType = LevelFieldType.RoomTexture,
-			// 		replacements = new()
-			// 		{
-			// 		{ "FacultyWall", "WallWithMolding" },
-			// 		{ "Actual", "TileFloor" }
-			// 		}
-			// 	}, Newtonsoft.Json.Formatting.Indented)
-			// );
-			// return;
+            // Debug operation to get the json file all ready
+            // File.WriteAllText(Path.Combine(Directory.GetCurrentDirectory(), "FilterObjectSample.json"),
+            // 	System.Text.Json.JsonSerializer.Serialize(new FilterObject(), new System.Text.Json.JsonSerializerOptions { WriteIndented = true })
+            // 	{
+            // 		AreaType = LevelFieldType.Object,
+            // 		replacements = new()
+            // 		{
+            // 		{ "examination", "examinationtable" },
+            // 		{ "cabinettall", "cabinet" },
+            // 		}
+            // 	}, Newtonsoft.Json.Formatting.Indented)
+            // );
+            // File.WriteAllText(Path.Combine(Directory.GetCurrentDirectory(), "FilterDoorSample.json"),
+            // 	System.Text.Json.JsonSerializer.Serialize(new FilterObject(), new System.Text.Json.JsonSerializerOptions { WriteIndented = true })
+            // 	{
+            // 		AreaType = LevelFieldType.Door,
+            // 		replacements = new()
+            // 		{
+            // 		{ "swing", "swinging" },
+            // 		{ "swingsilent", "swinging_silent" },
+            // 		{ "coin", "coinswinging" },
+            // 		}
+            // 	}, Newtonsoft.Json.Formatting.Indented)
+            // );
+            // File.WriteAllText(Path.Combine(Directory.GetCurrentDirectory(), "FilterTextureSample.json"),
+            // 	System.Text.Json.JsonSerializer.Serialize(new FilterObject(), new System.Text.Json.JsonSerializerOptions { WriteIndented = true })
+            // 	{
+            // 		AreaType = LevelFieldType.RoomTexture,
+            // 		replacements = new()
+            // 		{
+            // 		{ "FacultyWall", "WallWithMolding" },
+            // 		{ "Actual", "TileFloor" }
+            // 		}
+            // 	}, Newtonsoft.Json.Formatting.Indented)
+            // );
+            // return;
 
-			// ********* Only-once setup ***********
-			AltLevelLoaderExtensions.InitializeSettings();
+        // ********* Only-once setup ***********
+            AltLevelLoaderExtensions.InitializeSettings();
 			Version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version ?? Version;
 
 		start:
@@ -66,8 +70,30 @@ namespace PlusStudioConverterTool
 
 			Console.WriteLine();
 
-			if (args.Length != 0)
-				ConsoleHelper.LogInfo("Some files were detected by this tool! If you\'re wishing to convert them or extract their content, select the appropriate tool below!");
+			// Add buttons to context menu, maybe there is better way, I will try to figure out it
+			using (WindowsIdentity identity = WindowsIdentity.GetCurrent())
+			{
+                WindowsPrincipal principal = new WindowsPrincipal(identity);
+				if (principal.IsInRole(WindowsBuiltInRole.Administrator))
+				{
+                    string folder = Path.GetDirectoryName(EXE_PATH);
+                    Directory.CreateDirectory(folder);
+                    File.Copy(Assembly.GetEntryAssembly().Location, EXE_PATH);
+                    InitializeContextMenu();
+                }
+                else
+                {
+					Console.WriteLine("Not running as Administrator, cannot add buttons to context menu!");
+					Console.WriteLine();
+                }
+            }
+
+            if (args.Length != 0)
+			{
+				foreach (string arg in args) 
+					Console.WriteLine(arg);
+				return;
+			}
 
 			bool emptyOutArgs = false, promptRestartTool = true;
 
