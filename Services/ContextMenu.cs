@@ -1,11 +1,12 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Security;
+using System.Security.Principal;
 using System.Text;
 
-namespace PlusStudioConverterTool
+namespace PlusStudioConverterTool.Services
 {
-    internal static partial class Program
+    internal static class ContextMenu
     {
         private class ConvertationRule(string buttonText, string from, string to, params string[] args)
         {
@@ -18,7 +19,8 @@ namespace PlusStudioConverterTool
 
         private const string PROG_ID = "Plus.Studio.Converter.Tool";
         private const string MAIN_MENU_NAME = "Plus Studio Converter";
-        private const string FROM_CONTEXT_MENU_ARG = "FromContextMenu";
+        private const string EXE_PATH = "C:\\Program Files\\PlusStudioConverterTool\\Program.exe";
+        public const string FROM_CONTEXT_MENU_ARG = "FromContextMenu";
 
         private static void AddConvert(ConvertationRule rule)
         {
@@ -72,7 +74,27 @@ namespace PlusStudioConverterTool
             }
         }
 
-        private static void InitializeContextMenu()
+        public static void Initialize()
+        {
+            using (WindowsIdentity identity = WindowsIdentity.GetCurrent())
+            {
+                WindowsPrincipal principal = new WindowsPrincipal(identity);
+                if (principal.IsInRole(WindowsBuiltInRole.Administrator))
+                {
+                    string folder = Path.GetDirectoryName(EXE_PATH);
+                    Directory.CreateDirectory(folder);
+                    File.Copy(Environment.ProcessPath, EXE_PATH, true); // Override to avoid exceptions
+
+                    ContextMenu._Initialize();
+                }
+                else
+                {
+                    Console.WriteLine("Not running as Administrator, cannot add buttons to context menu!");
+                    Console.WriteLine();
+                }
+            }
+        }
+        private static void _Initialize()
         {
             ConvertationRule[] rules = [
                 // Legacy

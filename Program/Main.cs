@@ -7,7 +7,6 @@ namespace PlusStudioConverterTool
 {
 	internal static partial class Program
 	{
-        private const string EXE_PATH = "C:\\Program Files\\PlusStudioConverterTool\\Program.exe";
 
         private static void Main(string[] args)
 		{
@@ -70,26 +69,11 @@ namespace PlusStudioConverterTool
 
 			Console.WriteLine();
 
-            using (WindowsIdentity identity = WindowsIdentity.GetCurrent())
-            {
-                WindowsPrincipal principal = new WindowsPrincipal(identity);
-                if (principal.IsInRole(WindowsBuiltInRole.Administrator))
-                {
-                    string folder = Path.GetDirectoryName(EXE_PATH);
-                    Directory.CreateDirectory(folder);
-                    File.Copy(Environment.ProcessPath, EXE_PATH, true); // Override to avoid exceptions
-                    InitializeContextMenu();
-                }
-                else
-                {
-                    Console.WriteLine("Not running as Administrator, cannot add buttons to context menu!");
-                    Console.WriteLine();
-                }
-            }
+          
 
             if (args.Length != 0)
             {
-                if (args[0] == FROM_CONTEXT_MENU_ARG)
+                if (args[0] == ContextMenu.FROM_CONTEXT_MENU_ARG)
                 {
                     string file = args[1];
                     string to = args[2];
@@ -106,7 +90,8 @@ namespace PlusStudioConverterTool
 					"Converter Tool", // 1
 					"Content Package Extractor", // 2
 					"JSON-Filter Settings", // 3
-					"EBPL Filter" // 4
+					"EBPL Filter", // 4
+                    "Add To Context Menu" // 5
 					);
 			Console.Clear();
 			switch (optionTuple.Item1)
@@ -128,6 +113,9 @@ namespace PlusStudioConverterTool
 				case 4:
 					(emptyOutArgs, promptRestartTool) = EBPLFilterField(ref args);
 					break;
+                case 5:
+                    ContextMenu.Initialize();
+                    break;
 			}
 
 
@@ -144,5 +132,5 @@ namespace PlusStudioConverterTool
 
 
 		public static Version Version = new();
-	}
+    }
 }
