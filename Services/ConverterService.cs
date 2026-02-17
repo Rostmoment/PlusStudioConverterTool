@@ -2,6 +2,7 @@ using BaldiLevelEditor;
 using PlusLevelFormat;
 using PlusLevelStudio;
 using PlusLevelStudio.Editor;
+using PlusLevelStudio.Lua;
 using PlusStudioConverterTool.Converters;
 using PlusStudioConverterTool.Extensions;
 using PlusStudioConverterTool.Models;
@@ -13,12 +14,36 @@ namespace PlusStudioConverterTool.Services
     {
         public static void ConvertSingleFile(string file, string to, string[] args)
         {
+            // TODO: rewrite to TargetType
+            #region legacy
+            if (file.EndsWith(".cbld", StringComparison.OrdinalIgnoreCase))
+            {
+                if (to.EndsWith(".bld", StringComparison.OrdinalIgnoreCase))
+                    ConvertCBLDtoBLDFiles(file, null, out _, null);
+                else if (to.EndsWith(".rbpl", StringComparison.OrdinalIgnoreCase))
+                    ConvertCBLDtoRBPLFiles(file, null, out _, new CBLDtoRBPLSettings(bool.Parse(args[0])));
+                
+
+            }
+            if (file.EndsWith(".bld", StringComparison.OrdinalIgnoreCase))
+            {
+                if (to.EndsWith(".ebpl"))
+                    ConvertBLDtoEBPLFiles(file, null, out _, new BLDtoEBPLSettings(bool.Parse(args[0]), args[1]));
+            }
+            #endregion
+
             if (file.EndsWith(".rbpl", StringComparison.OrdinalIgnoreCase))
             {
                 if (!to.EndsWith(".ebpl", StringComparison.OrdinalIgnoreCase))
                     throw new ArgumentException("Cannot convert .rbpl to not .ebpl");
 
-                ConvertFiles([file], null, TargetType.RBPLtoEBPL);
+                ConvertCBLDtoBLDFiles(file, null, out _, null);
+            }
+
+            if (file.EndsWith(".pbpl", StringComparison.OrdinalIgnoreCase))
+            {
+                if (to.EndsWith(".lua", StringComparison.OrdinalIgnoreCase))
+                    ConvertPBPLtoLUA(file, null, out _, null);
             }
         }
         // Convert a list of absolute file paths (.cbld) and optionally export all
@@ -37,7 +62,7 @@ namespace PlusStudioConverterTool.Services
                     break;
                 case TargetType.BLDtoEBPL:
                     settings = new BLDtoEBPLSettings(
-                        ConsoleHelper.CheckIfUserInputsYOrN("Should the converter automatically include procedually generated lighting into the level(s)?"),
+                        ConsoleHelper.CheckIfUserInputsYOrN("Should the converter automatically include procedurally generated lighting into the level(s)?"),
                         ConsoleHelper.RetrieveUserSelection("Which editor mode should the converted level(s) use?", "Full", "Compliant").Item2.ToLower()
                     );
                     action = ConvertBLDtoEBPLFiles;
@@ -55,13 +80,16 @@ namespace PlusStudioConverterTool.Services
                     settings = new EditorSettings(
                         ConsoleHelper.RetrieveUserSelection("Which editor mode should the converted level(s) use?", "Full", "Compliant").Item2.ToLower()
                     );
-                    action = ConvertPBPLoEBPLFiles;
+                    action = ConvertPBPLtoEBPLFiles;
                     break;
                 case TargetType.BPLtoEBPL:
                     settings = new EditorSettings(
                         ConsoleHelper.RetrieveUserSelection("Which editor mode should the converted level(s) use?", "Full", "Compliant").Item2.ToLower()
                     );
-                    action = ConvertBPLoEBPLFiles;
+                    action = ConvertBPLtoEBPLFiles;
+                    break;
+                case TargetType.PBPLtoLUA:
+                    action = ConvertPBPLtoLUA;
                     break;
                 default:
                     throw new ArgumentException("Invalid TargetType");
@@ -266,7 +294,35 @@ namespace PlusStudioConverterTool.Services
             ConsoleHelper.LogSuccess($"RBPL file converted to {Path.GetFileName(fname)}");
         }
 
-        private static void ConvertPBPLoEBPLFiles(string file, string? exportFolder, out string fname, ConversionSettings? settings)
+        private static void ConvertPBPLtoLUA(string file, string? exportFolder, out string fname, ConversionSettings? settings)
+        {
+            ConsoleHelper.LogInfo("Reading PBPL level...");
+            PlayableEditorLevel level;
+            using (var reader = new BinaryReader(File.OpenRead(file)))
+            {
+                level = reader.ReadPlayableLevelWithoutThumbnail(out _);
+            }
+
+            if (level.meta.modeSettings is not CustomChallengeGameModeSettings lua)
+            {
+                Console.WriteLine("Given level doesn't have lua");
+                fname = "";
+                return;
+            }
+
+
+            var targetDir = string.IsNullOrEmpty(exportFolder) ? Path.GetDirectoryName(file) : exportFolder;
+            if (string.IsNullOrEmpty(targetDir))
+                throw new DirectoryNotFoundException("Could not determine target directory for output file.");
+
+            fname = Path.Combine(targetDir, Path.GetFileNameWithoutExtension(file) + ".lua");
+
+            // Ensure we don't overwrite an existing file: pick a unique filename
+            fname = GetUniqueFilePath(fname);
+
+            File.WriteAllText(fname, lua.luaScript);
+        }
+        private static void ConvertPBPLtoEBPLFiles(string file, string? exportFolder, out string fname, ConversionSettings? settings)
         {
             ArgumentNullException.ThrowIfNull(settings);
 
@@ -330,7 +386,7 @@ namespace PlusStudioConverterTool.Services
             ConsoleHelper.LogSuccess($"PBPL file converted to {Path.GetFileName(fname)}");
         }
 
-        private static void ConvertBPLoEBPLFiles(string file, string? exportFolder, out string fname, ConversionSettings? settings)
+        private static void ConvertBPLtoEBPLFiles(string file, string? exportFolder, out string fname, ConversionSettings? settings)
         {
             ArgumentNullException.ThrowIfNull(settings);
 

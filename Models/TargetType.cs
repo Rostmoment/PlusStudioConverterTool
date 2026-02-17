@@ -9,4 +9,5 @@ internal enum TargetType
     RBPLtoEBPL = 4,
     PBPLtoEBPL = 5,
     BPLtoEBPL = 6,
+    PBPLtoLUA = 7
 }

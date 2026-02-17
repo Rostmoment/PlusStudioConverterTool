@@ -27,6 +27,7 @@ namespace PlusStudioConverterTool
 				"RBPLtoEBPL Converter",
 				"PBPLtoEBPL Converter",
 				"BPLtoEBPL Converter",
+				"PBPLtoLUA Converter",
 				"Exit"
 				);
 			string[] descriptions = [
@@ -35,7 +36,8 @@ namespace PlusStudioConverterTool
 				"Converts a BLD to a EBPL file. In other words, a legacy editor file to a new one! And you don\'t even lose a bit from what was in the older days.",
 				"Converts the RBPL file to a EBPL. This way, you can actually edit back your room!",
 				"Converts the PBPL file to a EBPL. The playable level becomes an editable level! Just note it technically works the same way as CBLDtoBLD, but with key differences in loading structures.",
-				"Converts the BPL file to a EBPL. This compiled level can turn into an editable one with no issue!"
+				"Converts the BPL file to a EBPL. This compiled level can turn into an editable one with no issue!",
+				"Exports Lua script from level"
 			];
 
 			if (optionTuple.Item2 == "Exit") // Literally exits the tool

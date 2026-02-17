@@ -12,6 +12,7 @@ internal static class TargetTypeExtensions
         TargetType.RBPLtoEBPL => ".rbpl",
         TargetType.PBPLtoEBPL => ".pbpl",
         TargetType.BPLtoEBPL => ".bpl",
+        TargetType.PBPLtoLUA => ".pbpl",
         _ => string.Empty
     };
 }

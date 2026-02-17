@@ -99,9 +99,17 @@ namespace PlusStudioConverterTool.Services
             ConvertationRule[] rules = [
                 // Legacy
                 new ConvertationRule("Convert to .bld", ".cbld", ".bld"),
+                new ConvertationRule("Convert to .rbpl (With auto door spots)", ".cbld", ".rbpl", bool.TrueString),
+                new ConvertationRule("Convert to .rbpl (No auto door spots)", ".cbld", ".rbpl", bool.FalseString),
+
+                new ConvertationRule("Convert to full .ebpl (With procedural light)", ".bld", ".ebpl",  bool.TrueString, "Full"),
+                new ConvertationRule("Convert to full .ebpl (No procedural light)", ".bld", ".ebpl",  bool.FalseString, "Full"),
+                new ConvertationRule("Convert to compliant .ebpl (With procedural light)", ".bld", ".ebpl",  bool.TrueString, "Compliant"),
+                new ConvertationRule("Convert to compliant .ebpl (No procedural light)", ".bld", ".ebpl",  bool.FalseString, "Compliant"),
 
                 // New
-                new ConvertationRule("Convert to .ebpl", ".rbpl", ".ebpl")
+                new ConvertationRule("Convert to .ebpl", ".rbpl", ".ebpl"),
+                new ConvertationRule("Export Lua script", ".pbpl", ".lua")
             ];
 
             foreach (ConvertationRule rule in rules)
