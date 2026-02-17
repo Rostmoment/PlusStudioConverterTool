@@ -1,5 +1,7 @@
 ﻿using PlusStudioConverterTool.Extensions;
 using PlusStudioConverterTool.Services;
+using System.Reflection;
+using System.Security.Principal;
 
 namespace PlusStudioConverterTool
 {
@@ -67,7 +69,23 @@ namespace PlusStudioConverterTool
 			ConfigurationHandler.InitializeConfigFile();
 
 			Console.WriteLine();
-			InitializeContextMenu();
+
+            using (WindowsIdentity identity = WindowsIdentity.GetCurrent())
+            {
+                WindowsPrincipal principal = new WindowsPrincipal(identity);
+                if (principal.IsInRole(WindowsBuiltInRole.Administrator))
+                {
+                    string folder = Path.GetDirectoryName(EXE_PATH);
+                    Directory.CreateDirectory(folder);
+                    File.Copy(Environment.ProcessPath, EXE_PATH, true); // Override to avoid exceptions
+                    InitializeContextMenu();
+                }
+                else
+                {
+                    Console.WriteLine("Not running as Administrator, cannot add buttons to context menu!");
+                    Console.WriteLine();
+                }
+            }
 
             if (args.Length != 0)
             {
@@ -76,6 +94,7 @@ namespace PlusStudioConverterTool
                     string file = args[1];
                     string to = args[2];
 
+					ConverterService.ConvertSingleFile(file, to, args.Skip(3).ToArray());
                     return;
                 }
             }

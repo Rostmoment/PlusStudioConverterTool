@@ -11,7 +11,16 @@ namespace PlusStudioConverterTool.Services
 {
     internal static class ConverterService
     {
+        public static void ConvertSingleFile(string file, string to, string[] args)
+        {
+            if (file.EndsWith(".rbpl", StringComparison.OrdinalIgnoreCase))
+            {
+                if (!to.EndsWith(".ebpl", StringComparison.OrdinalIgnoreCase))
+                    throw new ArgumentException("Cannot convert .rbpl to not .ebpl");
 
+                ConvertFiles([file], null, TargetType.RBPLtoEBPL);
+            }
+        }
         // Convert a list of absolute file paths (.cbld) and optionally export all
         // converted files into exportFolder. If exportFolder is null the converted
         // file is written next to the original file.
