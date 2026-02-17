@@ -9,7 +9,6 @@ namespace PlusStudioConverterTool
     {
         private class ConvertationRule(string buttonText, string from, string to, params string[] args)
         {
-
             public string ProgId => $"{PROG_ID}{from}";
             public string ButtonText { get; } = buttonText;
             public string From { get; } = from;
@@ -18,7 +17,8 @@ namespace PlusStudioConverterTool
         }
 
         private const string PROG_ID = "Plus.Studio.Converter.Tool";
-
+        private const string MAIN_MENU_NAME = "Plus Studio Converter";
+        private const string FROM_CONTEXT_MENU_ARG = "FromContextMenu";
 
         private static void AddConvert(ConvertationRule rule)
         {
@@ -29,24 +29,38 @@ namespace PlusStudioConverterTool
                     extKey.SetValue("", rule.ProgId);
                 }
 
-                string shellPath = $@"Software\Classes\{rule.ProgId}\shell\{rule.ButtonText}\command";
-
-                using (RegistryKey menuKey = Registry.CurrentUser.CreateSubKey(shellPath))
+                // Creating "multi button"
+                string mainMenuPath = $@"Software\Classes\{rule.ProgId}\shell\PlusStudioMenu";
+                using (RegistryKey mainMenuKey = Registry.CurrentUser.CreateSubKey(mainMenuPath))
                 {
-                    StringBuilder b = new StringBuilder();
-                    b.Append('"').Append(EXE_PATH).Append('"');
-
-                    foreach (string arg in rule.Args)
-                    {
-                        b.Append(" \"").Append(arg).Append('"');
-                    }
-
-                    b.Append(" \"%1\"");
-
-                    menuKey.SetValue("", b.ToString());
+                    mainMenuKey.SetValue("MUIVerb", MAIN_MENU_NAME);
+                    mainMenuKey.SetValue("SubCommands", "");
+                    // mainMenuKey.SetValue("Icon", EXE_PATH);
                 }
 
-                Console.WriteLine($"Added rule from {rule.From} to {rule.To} with name {rule.ButtonText}");
+
+                string subCommandPath = $@"{mainMenuPath}\shell\{rule.ButtonText}";
+                using (RegistryKey subKey = Registry.CurrentUser.CreateSubKey(subCommandPath))
+                {
+                    subKey.SetValue("MUIVerb", rule.ButtonText);
+
+                    using (RegistryKey cmdKey = subKey.CreateSubKey("command"))
+                    {
+                        StringBuilder b = new StringBuilder();
+                        b.Append('"').Append(EXE_PATH).Append('"');
+                        b.Append(" \"").Append(FROM_CONTEXT_MENU_ARG).Append("\"");
+                        b.Append(" \"%1\"");
+                        b.Append(" \"").Append(rule.To).Append('"');
+
+                        foreach (string arg in rule.Args)
+                        {
+                            b.Append(" \"").Append(arg).Append('"');
+                        }
+                        cmdKey.SetValue("", b.ToString());
+                    }
+                }
+
+                Console.WriteLine($"Added '{rule.ButtonText}' to sub-menu for {rule.From}");
             }
             catch (SecurityException ex)
             {
@@ -61,10 +75,10 @@ namespace PlusStudioConverterTool
         private static void InitializeContextMenu()
         {
             ConvertationRule[] rules = [
-                // Legacy files
+                // Legacy
                 new ConvertationRule("Convert to .bld", ".cbld", ".bld"),
 
-                // Newer files
+                // New
                 new ConvertationRule("Convert to .ebpl", ".rbpl", ".ebpl")
             ];
 

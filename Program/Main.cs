@@ -1,7 +1,5 @@
 ﻿using PlusStudioConverterTool.Extensions;
 using PlusStudioConverterTool.Services;
-using System.Reflection;
-using System.Security.Principal;
 
 namespace PlusStudioConverterTool
 {
@@ -69,33 +67,20 @@ namespace PlusStudioConverterTool
 			ConfigurationHandler.InitializeConfigFile();
 
 			Console.WriteLine();
+			InitializeContextMenu();
 
-			// Add buttons to context menu, maybe there is better way, I will try to figure out it
-			using (WindowsIdentity identity = WindowsIdentity.GetCurrent())
-			{
-                WindowsPrincipal principal = new WindowsPrincipal(identity);
-				if (principal.IsInRole(WindowsBuiltInRole.Administrator))
-				{
-                    string folder = Path.GetDirectoryName(EXE_PATH);
-                    Directory.CreateDirectory(folder);
-                    File.Copy(Assembly.GetEntryAssembly().Location, EXE_PATH);
-                    InitializeContextMenu();
-                }
-                else
+            if (args.Length != 0)
+            {
+                if (args[0] == FROM_CONTEXT_MENU_ARG)
                 {
-					Console.WriteLine("Not running as Administrator, cannot add buttons to context menu!");
-					Console.WriteLine();
+                    string file = args[1];
+                    string to = args[2];
+
+                    return;
                 }
             }
 
-            if (args.Length != 0)
-			{
-				foreach (string arg in args) 
-					Console.WriteLine(arg);
-				return;
-			}
-
-			bool emptyOutArgs = false, promptRestartTool = true;
+            bool emptyOutArgs = false, promptRestartTool = true;
 
 			// **) Between options
 			var optionTuple = ConsoleHelper.RetrieveUserSelection("Here\'s a list of the available menus to explore inside this tool.",

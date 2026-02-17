@@ -12,8 +12,6 @@
     <PackageIcon></PackageIcon>
     <ApplicationIcon>cbldtobld.ico</ApplicationIcon>
     <PublishTrimmed>true</PublishTrimmed>
-	<PublishSingleFile>true</PublishSingleFile>
-	<SelfContained>true</SelfContained>
   </PropertyGroup>
 
   <ItemGroup>
