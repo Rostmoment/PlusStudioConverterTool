@@ -45,6 +45,47 @@ internal static class ConfigurationHandler
         InternalTryReserializeConfigFile(true);
     public static void DeserializeFilters() => InternalDeserializeFilters(true);
 
+    public static bool TryAddJsonConfig(string jsonPath)
+    {
+        // Basic validation
+        if (string.IsNullOrWhiteSpace(jsonPath))
+            return false;
+
+        if (!File.Exists(jsonPath) || Path.GetExtension(jsonPath) != ".json")
+            return false;
+
+        try
+        {
+            string fileContent = File.ReadAllText(jsonPath);
+            FilterObject filterObj = JsonSerializer.Deserialize(fileContent, AppJsonContext.Default.FilterObject);
+
+            if (filterObj == null)
+                return false;
+
+            // Must contain at least something
+            if (filterObj.replacements.Count == 0 && filterObj.exclusions.Count == 0)
+                return false;
+
+            // Validate AreaType
+            if (!Enum.TryParse<LevelFieldType>(filterObj.AreaType, out _))
+                return false;
+
+            // Prevent duplicates
+            if (configFile.jsonFilterPaths.Contains(jsonPath))
+                return false;
+
+            // Everything is valid, so add it
+            configFile.jsonFilterPaths.Add(jsonPath);
+            return true;
+        }
+        catch
+        {
+            // Silent stop, no exception throwing
+            return false;
+        }
+    }
+
+
 
     // ********* Internal methods **********
 

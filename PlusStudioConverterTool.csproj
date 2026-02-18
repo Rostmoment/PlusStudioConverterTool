@@ -49,11 +49,11 @@
 	 </Reference>
 	 
 	 <Reference Include="PlusLevelStudio">
-	   <HintPath>..\..\..\..\..\Steam\steamapps\common\Baldi's Basics Plus\BepInEx\editor before oct 8\PlusLevelStudio.dll</HintPath>
+	   <HintPath>..\..\..\..\..\Steam\steamapps\common\Baldi's Basics Plus\BepInEx\plugins\PlusLevelStudio.dll</HintPath>
 	 </Reference>
 	 
 	 <Reference Include="PlusStudioLevelFormat">
-	   <HintPath>..\..\..\..\..\Steam\steamapps\common\Baldi's Basics Plus\BepInEx\editor before oct 8\PlusStudioLevelFormat.dll</HintPath>
+	   <HintPath>..\..\..\..\..\Steam\steamapps\common\Baldi's Basics Plus\BepInEx\plugins\PlusStudioLevelFormat.dll</HintPath>
 	 </Reference>
 	 
 	 <Reference Include="PlusStudioLevelLoader">

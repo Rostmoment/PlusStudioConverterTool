@@ -79,7 +79,12 @@ namespace PlusStudioConverterTool
                     string file = args[1];
                     string to = args[2];
 
-					ConverterService.ConvertSingleFile(file, to, args.Skip(3).ToArray());
+                    foreach (string json in Directory.GetFiles(Path.GetDirectoryName(file), "*.json"))
+                        ConfigurationHandler.TryAddJsonConfig(json);
+
+                    ConfigurationHandler.DeserializeFilters();
+
+                    ConverterService.ConvertSingleFile(file, to, args.Skip(3).ToArray());
                     return;
                 }
             }
