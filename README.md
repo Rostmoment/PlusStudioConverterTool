@@ -22,10 +22,11 @@ It works with both modern and old file formats, and can also pull out embedded a
 
 ## How do I use it?
 
-You’ve got two ways:
+You’ve got three ways:
 
 1. **Drag & Drop** -> Drop a file or folder onto the executable. It'll store them until your next input.
 2. **CLI mode** -> Open the exe directly and use the simple menu to pick conversions or actions.
+3. **From context menu** -> Firsly run tool as administrator and add buttons to context menu. That you can click with right mouse button on file to convert it to needed extension.
 
 ## When would I use this?
 
