@@ -89,7 +89,7 @@ namespace PlusStudioConverterTool.Services
                 }
                 else
                 {
-                    Console.WriteLine("Not running as Administrator, cannot add buttons to context menu!");
+                    Console.WriteLine("Not running as administrator, cannot add buttons to context menu!");
                     Console.WriteLine();
                 }
             }
@@ -109,7 +109,13 @@ namespace PlusStudioConverterTool.Services
 
                 // New
                 new ConvertationRule("Convert to .ebpl", ".rbpl", ".ebpl"),
-                new ConvertationRule("Export Lua script", ".pbpl", ".lua")
+                new ConvertationRule("Export Lua script", ".pbpl", ".lua"),
+
+                new ConvertationRule("Convert to full .ebpl", ".pbpl", ".ebpl", "Full"),
+                new ConvertationRule("Convert to compliant .ebpl", ".pbpl", ".ebpl", "Compliant"),
+
+                new ConvertationRule("Convert to compliant .ebpl", ".bpl", ".ebpl", "Compliant"),
+                new ConvertationRule("Convert to full .ebpl", ".bpl", ".ebpl", "Full")
             ];
 
             foreach (ConvertationRule rule in rules)

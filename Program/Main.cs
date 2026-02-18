@@ -64,7 +64,8 @@ namespace PlusStudioConverterTool
 			");
 
 			Console.WriteLine($"Plus Studio Converter Tool. Made by PixelGuy. v{Version}");
-			Console.WriteLine("Plus Level Editor and Plus Level Studio were made by MissingTextureMan101.");
+            Console.WriteLine($"Fork made by Rost.");
+            Console.WriteLine("Plus Level Editor and Plus Level Studio were made by MissingTextureMan101.");
 			ConfigurationHandler.InitializeConfigFile();
 
 			Console.WriteLine();

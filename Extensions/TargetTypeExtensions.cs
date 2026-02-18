@@ -15,4 +15,27 @@ internal static class TargetTypeExtensions
         TargetType.PBPLtoLUA => ".pbpl",
         _ => string.Empty
     };
+    public static TargetType ToTarget(string from, string to)
+    {
+        string fromExt = Path.GetExtension(from);
+        string toExt = Path.GetExtension(to);
+
+        return (fromExt.ToLowerInvariant(), toExt.ToLowerInvariant()) switch
+        {
+            (".bld", ".ebpl") => TargetType.BLDtoEBPL,
+
+            (".cbld", ".bld") => TargetType.CBLDtoBLD,
+            (".cbld", ".rbpl") => TargetType.CBLDtoRBPL,
+
+            (".rbpl", ".ebpl") => TargetType.RBPLtoEBPL,
+
+            (".pbpl", ".ebpl") => TargetType.PBPLtoEBPL,
+            (".pbpl", ".lua") => TargetType.PBPLtoLUA,
+
+            (".bpl", ".ebpl") => TargetType.BPLtoEBPL,
+
+            _ => throw new ArgumentException($"Cannot convert {from} to {to}")
+        };
+    }
+
 }

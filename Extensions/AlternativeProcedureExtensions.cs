@@ -4,6 +4,7 @@ using PlusLevelStudio.Editor.ModeSettings;
 using PlusLevelStudio.Lua;
 using PlusStudioLevelFormat;
 using PlusStudioLevelLoader;
+using UnityEngine.Playables;
 
 namespace PlusStudioConverterTool.Extensions;
 
@@ -327,16 +328,17 @@ internal static class AltLevelLoaderExtensions
     {
         PlayableEditorLevel playableEditorLevel = new();
         thumbnailData = null;
-        int num;
-        if (reader.ReadByte() >= 1)
+        byte version = reader.ReadByte();
+        if ((version >= 1) && (version < 3))
         {
-            num = reader.ReadInt32();
+            int num = reader.ReadInt32();
             if (num > 0)
                 thumbnailData = reader.ReadBytes(num); // Discard whatever is done here
         }
 
         playableEditorLevel.meta = reader.ReadPlayableLevelMetaWithoutEditor(false);
         playableEditorLevel.data = BaldiLevel.Read(reader);
+
         return playableEditorLevel;
     }
 
@@ -344,15 +346,17 @@ internal static class AltLevelLoaderExtensions
     {
         // ** Manually load PlayableLevelMeta to prevent using StudioPlugin
         PlayableLevelMeta playableLevelMeta = new();
-        byte byNum = reader.ReadByte();
+        byte version = reader.ReadByte();
         playableLevelMeta.name = reader.ReadString();
-        if (byNum >= 1)
+
+        if (version >= 1)
         {
             playableLevelMeta.author = reader.ReadString();
         }
 
         playableLevelMeta.gameMode = reader.ReadString();
         bool readIntoBoolean = reader.ReadBoolean();
+
         if (gameModeAliases.ContainsKey(playableLevelMeta.gameMode))
         {
             if (!readIntoBoolean)
@@ -366,7 +370,7 @@ internal static class AltLevelLoaderExtensions
             }
         }
 
-        if (byNum < 2)
+        if (version < 2)
         {
             playableLevelMeta.contentPackage = new EditorCustomContentPackage(useOldFilePaths);
         }
@@ -380,7 +384,9 @@ internal static class AltLevelLoaderExtensions
     internal static void InitializeSettings()
     {
         gameModeAliases.Add("standard", new MainGameMode());
+        gameModeAliases.Add("grapple", new EditorGameMode());
         gameModeAliases.Add("stealthy", new StealthyGameMode());
+        gameModeAliases.Add("speedy", new StealthyGameMode());
         gameModeAliases.Add("custom", new CustomChallengeGameMode());
     }
 
