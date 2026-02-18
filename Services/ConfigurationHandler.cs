@@ -76,6 +76,8 @@ internal static class ConfigurationHandler
 
             // Everything is valid, so add it
             configFile.jsonFilterPaths.Add(jsonPath);
+            Console.WriteLine($"Added {jsonPath} to filters");
+
             return true;
         }
         catch

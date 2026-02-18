@@ -15,6 +15,7 @@ namespace PlusStudioConverterTool.Services
         public static void ConvertSingleFile(string file, string to, string[] args)
         {
             TargetType type = TargetTypeExtensions.ToTarget(file, to);
+            string mode = "";
 
             switch (type)
             {
@@ -24,19 +25,27 @@ namespace PlusStudioConverterTool.Services
                     ConvertCBLDtoBLDFiles(file, null, out _, null);
                     break;
                 case TargetType.CBLDtoRBPL:
-                    ConvertCBLDtoRBPLFiles(file, null, out _, new CBLDtoRBPLSettings(bool.Parse(args[0])));
+                    bool autoDoor = bool.Parse(args[0]);
+                    ConvertCBLDtoRBPLFiles(file, null, out _, new CBLDtoRBPLSettings(autoDoor));
                     break;
                 case TargetType.BLDtoEBPL:
-                    ConvertBLDtoEBPLFiles(file, null, out _, new BLDtoEBPLSettings(bool.Parse(args[0]), args[1]));
+                    bool autoLight = bool.Parse(args[0]);
+                    mode = args[1].ToLower();
+
+                    ConvertBLDtoEBPLFiles(file, null, out _, new BLDtoEBPLSettings(autoLight, mode));
                     break;
                 case TargetType.RBPLtoEBPL:
                     ConvertRBPLtoEBPLFiles(file, null, out _, null);
                     break;
                 case TargetType.PBPLtoEBPL:
-                    ConvertPBPLtoEBPLFiles(file, null, out _, new EditorSettings(args[0]));
+                    mode = args[0].ToLower();
+
+                    ConvertPBPLtoEBPLFiles(file, null, out _, new EditorSettings(mode));
                     break;
                 case TargetType.BPLtoEBPL:
-                    ConvertBPLtoEBPLFiles(file, null, out _, new EditorSettings(args[0]));
+                    mode = args[0].ToLower();
+
+                    ConvertBPLtoEBPLFiles(file, null, out _, new EditorSettings(mode));
                     break;
                 case TargetType.PBPLtoLUA:
                     ConvertPBPLtoLUAFiles(file, null, out _, null);

@@ -82,6 +82,9 @@ namespace PlusStudioConverterTool
                     foreach (string json in Directory.GetFiles(Path.GetDirectoryName(file), "*.json"))
                         ConfigurationHandler.TryAddJsonConfig(json);
 
+                    foreach (string json in Directory.GetFiles(Directory.GetCurrentDirectory(), "*.json"))
+                        ConfigurationHandler.TryAddJsonConfig(json);
+
                     ConfigurationHandler.DeserializeFilters();
 
                     ConverterService.ConvertSingleFile(file, to, args.Skip(3).ToArray());

@@ -81,11 +81,8 @@ namespace PlusStudioConverterTool.Services
                 WindowsPrincipal principal = new WindowsPrincipal(identity);
                 if (principal.IsInRole(WindowsBuiltInRole.Administrator))
                 {
-                    string folder = Path.GetDirectoryName(EXE_PATH);
-                    Directory.CreateDirectory(folder);
-                    File.Copy(Environment.ProcessPath, EXE_PATH, true); // Override to avoid exceptions
-
-                    ContextMenu._Initialize();
+                    MoveExe();
+                    ContextMenu.InternalInitialize();
                 }
                 else
                 {
@@ -94,7 +91,21 @@ namespace PlusStudioConverterTool.Services
                 }
             }
         }
-        private static void _Initialize()
+        private static void MoveExe()
+        {
+            string folder = Path.GetDirectoryName(EXE_PATH);
+            Directory.CreateDirectory(folder);
+            File.Copy(Environment.ProcessPath, EXE_PATH, true); // Override to avoid exceptions
+
+            // Need to copy default filters to be sure that they are active
+            foreach (string json in Directory.GetFiles(Directory.GetCurrentDirectory(), "*.json"))
+            {
+                using FileStream source = new FileStream(json, FileMode.Open, FileAccess.Read);
+                using FileStream dest = new FileStream(Path.Combine(folder, Path.GetFileName(json)), FileMode.Create, FileAccess.Write);
+                source.CopyTo(dest); // to avoid IOException
+            }
+        }
+        private static void InternalInitialize()
         {
             ConvertationRule[] rules = [
                 // Legacy
